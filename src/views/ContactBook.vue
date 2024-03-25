@@ -8,11 +8,8 @@
                 Danh bạ
                 <i class="fas fa-address-book"></i>
             </h4>
-            <ContactList
-                v-if="filteredContactsCount > 0"
-                :contacts="filteredContacts"
-                v-model:activeIndex="activeIndex"
-            />
+            <ContactList v-if="filteredContactsCount > 0" :contacts="filteredContacts"
+                v-model:activeIndex="activeIndex" />
             <p v-else>Không có liên hệ nào.</p>
 
             <div class="mt-3 row justify-content-around align-items-center">
@@ -36,6 +33,15 @@
                     <i class="fas fa-address-card"></i>
                 </h4>
                 <ContactCard :contact="activeContact" />
+                <router-link 
+                    :to="{
+                        name: 'contact.edit',
+                        params: { id: activeContact._id },
+                    }"
+                >
+                    <span class="mt-2 badge badge-warning">
+                        <i class="fas fa-edit"></i> Hiệu chỉnh</span>
+                </router-link>
             </div>
         </div>
     </div>
@@ -54,7 +60,7 @@ export default {
         ContactList,
     },
 
-    data(){
+    data() {
         return {
             contacts: [],
             activeIndex: -1,
@@ -63,35 +69,35 @@ export default {
     },
 
     watch: {
-        searchText(){
+        searchText() {
             this.activeIndex = -1;
         },
     },
 
     computed: {
-        contactStrings(){
+        contactStrings() {
             return this.contacts.map((contact) => {
-                const {name, email, address, phone} = contact;
+                const { name, email, address, phone } = contact;
                 return [name, email, address, phone].join("");
             });
         },
-        filteredContacts(){
-            if(!this.searchText) return this.contacts;
+        filteredContacts() {
+            if (!this.searchText) return this.contacts;
             return this.contacts.filter((_contact, index) =>
                 this.contactStrings[index].includes(this.searchText)
             );
         },
         activeContact() {
-            if(this.activeIndex < 0) return null;
+            if (this.activeIndex < 0) return null;
             return this.filteredContacts[this.activeIndex];
         },
-        filteredContactsCount(){
+        filteredContactsCount() {
             return this.filteredContacts.length;
         },
     },
 
     methods: {
-        async retrieveContacts(){
+        async retrieveContacts() {
             try {
                 this.contacts = await ContactService.getAll();
             } catch (error) {
@@ -104,8 +110,8 @@ export default {
             this.activeIndex = -1;
         },
 
-        async removeAllContacts(){
-            if (confirm("Bạn muốn xóa tất cả Liên hệ?")){
+        async removeAllContacts() {
+            if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
                 try {
                     await ContactService.deleteAll();
                     this.refreshList();
@@ -115,12 +121,12 @@ export default {
             }
         },
 
-        goToAddContact(){
-            this.$router.push({name: "contact.add"});
+        goToAddContact() {
+            this.$router.push({ name: "contact.add" });
         },
     },
 
-    mounted(){
+    mounted() {
         this.refreshList();
     },
 };
